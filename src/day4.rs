@@ -30,6 +30,53 @@ pub fn day_4_part_1() {
     println!("Accessible rolls: {:?}", accessible_count);
 }
 
+pub fn day_4_part_2() {
+    let file_path: &Path = Path::new("inputs/day4.txt");
+
+    let mut grid: Vec<Vec<char>> = read_char_grid(file_path).unwrap();
+
+    let mut accessible_count: i32 = 0;
+    let mut total_accessible: i32 = 0;
+    let mut iteration: i32 = 0;
+
+    while iteration < 100 {
+        for row_num in 0..grid.len() {
+            for col_num in 0..grid[0].len() {
+                if grid[row_num][col_num] != '@' {
+                    continue;
+                }
+                let nbr_idxs: Vec<(usize, usize)> = build_nbrs(row_num, col_num, grid.len() - 1, grid[row_num].len() - 1);
+                let mut roll_count: i32 = 0;
+                for (nbr_x, nbr_y) in nbr_idxs {
+                    if grid[nbr_x][nbr_y] != '.' {
+                        roll_count += 1;
+                    }
+                }
+                if roll_count < 4 {
+                    accessible_count += 1;
+                    grid[row_num][col_num] = 'X';
+                }
+            }
+        }
+        println!("Iteration {:?}, found {:?} accessible rolls", iteration, accessible_count);
+        total_accessible += accessible_count;
+        if accessible_count == 0 {
+            break;
+        }
+        // Clean up counters and grid for next iteration
+        iteration += 1;
+        accessible_count = 0;
+        for row_num in 0..grid.len() {
+            for col_num in 0..grid[0].len() {
+                if grid[row_num][col_num] == 'X' {
+                    grid[row_num][col_num] = '.';
+                }
+            }
+        }
+    }
+    println!("Total accessible rolls: {:?}", total_accessible);
+}
+
 fn build_nbrs(x: usize, y: usize, x_max: usize, y_max: usize) -> Vec<(usize, usize)> {
     let mut nbrs: Vec<(usize, usize)> = Vec::new();
     // 3 cells to the left
